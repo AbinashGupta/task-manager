@@ -1,10 +1,29 @@
 import { NextResponse } from 'next/server';
 import { getKanbanColumns } from '@/lib/services/taskService';
 import { ApiResponse, KanbanColumns } from '@/lib/types';
+import { storage } from '@/lib/storage/csvStorage';
 
 export async function GET() {
   try {
+    console.log('[COLUMNS-API] GET /api/kanban/columns — flow start', { csvPath: storage.getFilePath() });
+
     const columns = await getKanbanColumns();
+    const totalInColumns =
+      columns.todo.length + columns['in-progress'].length + columns.blocked.length + columns.done.length;
+    console.log('[COLUMNS-API] GET /api/kanban/columns — getKanbanColumns returned', {
+      todo: columns.todo.length,
+      'in-progress': columns['in-progress'].length,
+      blocked: columns.blocked.length,
+      done: columns.done.length,
+      totalInColumns,
+      taskIds: [
+        ...columns.todo.map((t) => t.id),
+        ...columns['in-progress'].map((t) => t.id),
+        ...columns.blocked.map((t) => t.id),
+        ...columns.done.map((t) => t.id),
+      ],
+    });
+
     const response: ApiResponse<KanbanColumns> = {
       success: true,
       data: columns,

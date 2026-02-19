@@ -69,12 +69,23 @@ export async function deleteTask(id: string): Promise<void> {
 
 export async function getKanbanColumns() {
   const tasks = await storage.getAllTasks();
-  return {
+  console.log('[COLUMNS-API] getKanbanColumns — storage.getAllTasks() returned', {
+    count: tasks.length,
+    tasks: tasks.map((t) => ({ id: t.id, status: t.status, dueDate: t.dueDate })),
+  });
+  const columns = {
     'todo': tasks.filter(t => t.status === 'todo'),
     'in-progress': tasks.filter(t => t.status === 'in-progress'),
     'blocked': tasks.filter(t => t.status === 'blocked'),
     'done': tasks.filter(t => t.status === 'done'),
   };
+  console.log('[COLUMNS-API] getKanbanColumns — filtered into columns', {
+    todo: columns.todo.length,
+    'in-progress': columns['in-progress'].length,
+    blocked: columns.blocked.length,
+    done: columns.done.length,
+  });
+  return columns;
 }
 
 export async function moveTask(taskId: string, newStatus: TaskStatus): Promise<Task> {

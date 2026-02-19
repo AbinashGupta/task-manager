@@ -14,6 +14,10 @@ export class CsvStorage implements IStorage {
     this.filePath = filePath;
   }
 
+  getFilePath(): string {
+    return this.filePath;
+  }
+
   private ensureFile(): void {
     const dir = path.dirname(this.filePath);
     if (!fs.existsSync(dir)) {

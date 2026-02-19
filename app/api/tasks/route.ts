@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { listTasks, createTask } from '@/lib/services/taskService';
 import { createTaskSchema } from '@/lib/validations';
 import { ApiResponse, Task } from '@/lib/types';
+import { storage } from '@/lib/storage/csvStorage';
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('[TASKS-API] GET /api/tasks — flow start', { csvPath: storage.getFilePath() });
+
     const searchParams = request.nextUrl.searchParams;
     const filters: {
       status?: any;
@@ -21,6 +24,11 @@ export async function GET(request: NextRequest) {
     if (searchParams.has('tags')) filters.tags = searchParams.get('tags') || undefined;
 
     const tasks = await listTasks(filters);
+    console.log('[TASKS-API] GET /api/tasks — listTasks returned', {
+      count: tasks.length,
+      tasks: tasks.map((t) => ({ id: t.id, status: t.status, dueDate: t.dueDate })),
+    });
+
     const response: ApiResponse<Task[]> = {
       success: true,
       data: tasks,
