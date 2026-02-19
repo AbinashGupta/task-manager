@@ -3,6 +3,10 @@ import { getKanbanColumns } from '@/lib/services/taskService';
 import { ApiResponse, KanbanColumns } from '@/lib/types';
 import { storage } from '@/lib/storage/csvStorage';
 
+// Prevent static prerender at build time (e.g. in Docker the CSV may be empty then).
+// Without this, GET with no request usage can be cached with empty columns.
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     console.log('[COLUMNS-API] GET /api/kanban/columns — flow start', { csvPath: storage.getFilePath() });
